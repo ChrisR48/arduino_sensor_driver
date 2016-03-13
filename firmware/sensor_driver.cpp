@@ -8,12 +8,18 @@
 #include <sensor_msgs/Temperature.h>
 #include <sensor_msgs/RelativeHumidity.h>
 
+#include <std_msgs/Bool.h>
+
 #include "Dht11.h"
+#include "TouchSensor.hpp"
 
 #define DHT_DATA_PIN 13
 #define DHT_COOL_DOWN 500
 
 Dht11 sensor(DHT_DATA_PIN);
+
+TouchSensor t1(12);
+TouchSensor t2(11);
 
 ros::NodeHandle nh;
 
@@ -22,6 +28,10 @@ ros::Publisher temp_pub("temperature", &temp_msg);
 
 sensor_msgs::RelativeHumidity humid_msg;
 ros::Publisher humid_pub("humidity", &humid_msg);
+
+std_msgs::Bool touchsensor_msg;
+ros::Publisher t1_pub("touchsensor/1", &touchsensor_msg);
+ros::Publisher t2_pub("touchsensor/2", &touchsensor_msg);
 
 long dht11_publisher_timer;
 
@@ -66,6 +76,23 @@ void processDHT11(){
 
 }
 
+long touchsensor_publisher_timer;
+
+void processTouchSensor(){
+    if (millis() < touchsensor_publisher_timer) {
+        return;
+    }
+
+    touchsensor_msg.data = t1.isPressed();
+    t1_pub.publish(&touchsensor_msg);
+
+
+    touchsensor_msg.data = t2.isPressed();
+    t2_pub.publish(&touchsensor_msg);
+
+    touchsensor_publisher_timer = millis() + 500;
+}
+
 int ret;
 void setup() {
 
@@ -79,6 +106,10 @@ void setup() {
 
     nh.advertise(humid_pub);
 
+    nh.advertise(t1_pub);
+
+    nh.advertise(t2_pub);
+
 }
 
 void loop() {
@@ -87,5 +118,6 @@ void loop() {
 
     processDHT11();
 
+    processTouchSensor();
 }
 

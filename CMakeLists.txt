@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosserial_client
   roscpp
   geometry_msgs
+  std_msgs
 )
 
 catkin_package(
