@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+  
+  <arg name="port" default="/dev/ttyACM0"/>
+  
+  <include file="$(find rosserial_server)/launch/serial.launch">
+    <arg name="port" value="$(arg port)" />
+  </include>
+  
+</launch>
+
